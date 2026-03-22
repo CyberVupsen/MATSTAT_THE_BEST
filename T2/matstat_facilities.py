@@ -251,3 +251,131 @@ def show_bootstr_compar_median(sample, bootstr_mass, dens_func_teor, num_points)
     axes.set_title("Плотность распред. медианы выборки")
     axes.legend()
     plt.show()
+
+
+def non_param_bootstr_teta(x, n):
+
+    s = np.sum(np.log(x))
+    teta_est = 1 + (n / s)
+    beta = 0.95
+
+    bootstrap_arr = []
+
+    for i in range(1000):
+        subselection = np.random.choice(x, size=n, replace=True)
+        s_subselection = np.sum(np.log(subselection))
+        theta_subselection = 1 + (n / s_subselection)
+        delta = theta_subselection - teta_est
+        bootstrap_arr.append(delta)
+
+    bootstrap = np.array(bootstrap_arr)
+    sorted_bootstrap = np.sort(bootstrap)
+
+    k1 = int(((1 - beta) / 2) * 1000)
+    k2 = int(((1 + beta) / 2) * 1000)
+
+    delta_k1 = sorted_bootstrap[k1]
+    delta_k2 = sorted_bootstrap[k2]
+
+    t_min = teta_est - delta_k2
+    t_max = teta_est - delta_k1
+
+    return t_min, t_max
+
+def non_param_bootstr_median(x, n):
+        
+    s = np.sum(np.log(x))
+    teta_est = 1 + (n / s)
+
+    median_estimate = 2**(1 / (teta_est - 1))
+
+    beta = 0.95
+
+    bootstrap_arr = []
+
+    for i in range(1000):
+        subselection = np.random.choice(x, size=n, replace=True)
+        s_subselection = np.sum(np.log(subselection))
+        theta_subselection = 1 + (n / s_subselection)
+        median_subselection = 2**(1 / (theta_subselection - 1))
+        delta = median_subselection - median_estimate
+        bootstrap_arr.append(delta)
+
+    bootstrap = np.array(bootstrap_arr)
+    sorted_bootstrap = np.sort(bootstrap)
+
+    k1 = int(((1 - beta) / 2) * 1000)
+    k2 = int(((1 + beta) / 2) * 1000)
+
+    delta_k1 = sorted_bootstrap[k1]
+    delta_k2 = sorted_bootstrap[k2]
+
+    t_min = median_estimate - delta_k2
+    t_max = median_estimate - delta_k1
+
+    return t_min, t_max
+
+def param_bootstr_median(x, n):
+
+    s = np.sum(np.log(x))
+    teta_est = 1 + (n / s)
+
+    median_estimate = 2**(1 / (teta_est - 1))
+
+    beta = 0.95
+
+    bootstrap_arr = []
+
+    for i in range(50000):
+        x_uniform = np.random.uniform(0, 1, n)
+        new_selection = ((1 - x_uniform))**(1 / (1 - teta_est))
+        new_s = np.sum(np.log(new_selection))
+        new_theta = 1 + (n / new_s)
+        new_median = 2**(1 / (new_theta - 1))
+        delta = new_median - median_estimate
+        bootstrap_arr.append(delta)
+
+    bootstrap = np.array(bootstrap_arr)
+    sorted_bootstrap = np.sort(bootstrap)
+
+    k1 = int(((1 - beta) / 2) * 50000)
+    k2 = int(((1 + beta) / 2) * 50000)
+
+    delta_k1 = sorted_bootstrap[k1]
+    delta_k2 = sorted_bootstrap[k2]
+
+    t_min = median_estimate - delta_k2
+    t_max = median_estimate - delta_k1
+
+    return t_min, t_max
+
+def param_bootstr_theta(x, n):
+
+    s = np.sum(np.log(x))
+    teta_est = 1 + (n / s)
+
+    beta = 0.95
+
+    bootstrap_arr = []
+
+    for i in range(50000):
+        x_uniform = np.random.uniform(0, 1, n)
+        new_selection = ((1 - x_uniform))**(1 / (1 - teta_est))
+        new_s = np.sum(np.log(new_selection))
+        new_theta = 1 + (n / new_s)
+        delta = new_theta - teta_est
+        bootstrap_arr.append(delta)
+
+    bootstrap = np.array(bootstrap_arr)
+    sorted_bootstrap = np.sort(bootstrap)
+
+    k1 = int(((1 - beta) / 2) * 50000)
+    k2 = int(((1 + beta) / 2) * 50000)
+
+    delta_k1 = sorted_bootstrap[k1]
+    delta_k2 = sorted_bootstrap[k2]
+
+    t_min = teta_est - delta_k2
+    t_max = teta_est - delta_k1
+
+    return t_min, t_max
