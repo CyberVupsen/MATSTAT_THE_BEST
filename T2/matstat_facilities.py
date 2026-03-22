@@ -379,3 +379,56 @@ def param_bootstr_theta(x, n):
     t_max = teta_est - delta_k1
 
     return t_min, t_max
+
+
+def non_param_bootstr_T5(u, n):
+        theta_estimate = (2 * n + 2)/(2 * n + 1) * np.max(u) / 2
+        beta = 0.95
+
+        bootstrap_array = []
+
+        for i in range(1000):
+            subselection = np.random.choice(u, size=n, replace=True)
+            theta_subselection = (2 * n + 2)/(2 * n + 1) * np.max(subselection) / 2
+            delta = theta_subselection - theta_estimate
+            bootstrap_array.append(delta)
+
+        bootstrap = np.array(bootstrap_array)
+        sorted_bootstrap = np.sort(bootstrap)
+
+        k1 = int(((1 - beta) / 2) * 1000)
+        k2 = int(((1 + beta) / 2) * 1000)
+
+        delta_k1 = sorted_bootstrap[k1]
+        delta_k2 = sorted_bootstrap[k2]
+
+        t_min = theta_estimate - delta_k2
+        t_max = theta_estimate - delta_k1
+
+        return t_min, t_max
+
+def param_bootstr_T5(u, n):
+        theta_estimate = (2 * n + 2)/(2 * n + 1) * np.max(u) / 2
+        beta = 0.95
+        bootstrap_array = []
+
+        for i in range(50000):
+            x_uniform = np.random.random_sample(size=n)
+            new_selection = theta_estimate * x_uniform + theta_estimate
+            new_theta = (2 * n + 2)/(2 * n + 1) * np.max(new_selection) / 2
+            delta = new_theta - theta_estimate
+            bootstrap_array.append(delta)
+
+        bootstrap = np.array(bootstrap_array)
+        sorted_bootstrap = np.sort(bootstrap)
+
+        k1 = int(((1 - beta) / 2) * 50000)
+        k2 = int(((1 + beta) / 2) * 50000)
+
+        delta_k1 = sorted_bootstrap[k1]
+        delta_k2 = sorted_bootstrap[k2]
+
+        t_min = theta_estimate - delta_k2
+        t_max = theta_estimate - delta_k1
+
+        return t_min, t_max
